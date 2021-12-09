@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Reflection {
+  List<Book> books = new ArrayList<>();
 
   public static class Autor {
     private String name;
@@ -43,5 +44,21 @@ public class Reflection {
       fieldNames.add(field.getName());
     }
     return fieldNames;
+  }
+  static boolean addBook(String s){
+    try{
+      String[] sArray = s.split("[&=]");
+      String method = sArray[1];
+      String authorName = sArray[3];
+      String authorSurname = sArray[5];
+      String bookTitle = sArray[7];
+
+      System.out.printf("%s | %s | %s | %s",method,authorName, authorSurname, bookTitle);
+      return true;
+    } catch(Exception e){
+      e.printStackTrace();
+      return false;
+    }
+
   }
 }

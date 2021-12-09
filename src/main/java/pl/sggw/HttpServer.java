@@ -2,33 +2,29 @@ package pl.sggw;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpServer {
   final static Path post = Path.of("src/main/resources/index.html");
-
+  static boolean status = true;
   public static void main(String[] args) throws IOException {
 
     ServerSocket serverSocket = new ServerSocket(8080);
 
-    while (true) {
+
+    while (status) {
       listenAndServe(serverSocket);
     }
   }
@@ -54,17 +50,37 @@ public class HttpServer {
     InputStream socketInputStream = socket.getInputStream();
     OutputStream socketOutputStream = socket.getOutputStream();
 
-    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
-    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
+    BufferedWriter bufferedWriter =
+        new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
+    BufferedReader bufferedReader =
+        new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
 
     //Read from Website
-    StringBuilder sb = new StringBuilder();
+    List<String> stringList = new ArrayList<>();
+    String tmp = "";
     while (bufferedReader.ready()) {
-      sb.append((char)bufferedReader.read());
+      char c = (char) bufferedReader.read();
+      if (c == '\n') {
+        stringList.add(tmp);
+        tmp = "";
+      } else {
+        tmp += c;
+      }
     }
-    String result = java.net.URLDecoder.decode(sb.toString(), StandardCharsets.UTF_8.name());
 
-    System.out.println(result);
+    //ostatnia linia z zapytaniem z Formularza
+    String formData = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
+
+    /*
+    for (String s:stringList) {
+      System.out.println(s);
+    }
+    */
+
+    //Operacje POST, GET, PUT, DELETE
+    if (stringList.get(0).startsWith("POST")) {
+      System.out.println(Reflection.addBook(formData));
+    }
 
 
     //Write to Website
@@ -73,7 +89,6 @@ public class HttpServer {
     bufferedWriter.write("Content-Type: text/html; charset=UTF-8 \n\n");
 
     bufferedWriter.write(Files.readString(post));
-    bufferedWriter.write("Zażółć gęśą jaźń");
 
     bufferedWriter.flush();
     bufferedWriter.close();
