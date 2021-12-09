@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="pl">
-  <head>
+<html>
+<head>
     <title>Przegądanie książek</title>
     <!-- Required meta tags -->
     <meta charset="UTF-8">
@@ -8,9 +8,11 @@
     <style>
     body{
       font-family: Helvetica;
+      background-color: #4f4f4f;
     }
     .form{
       margin:auto;
+      background-color:#afafaf;
     }
     label{
       display:block;
@@ -18,13 +20,14 @@
     input{
       margin-left:5px;
     }
-
-  </style>
-  </head>
-  <body>
-    <form class="form" action="" method="post" accept-charset="UTF-8">
-      <h1>Dodaj książkę: </h1>
-      <label>Autor<input type="text" name="authorName" value=""> <input type="text" name="authorSurname" value=""></label>
-      <label>Tytuł<input type="text" name="title" value=""></label>
-      <input type="submit" name="submit" value="Wyślij">
-    </form>
+    </style>
+</head>
+<body>
+<form class="form" action="" method="post" accept-charset="UTF-8">
+    <h1>Dodaj książkę: </h1>
+    <label>Autor<input type="text" name="authorName" value=""> <input type="text" name="authorSurname" value=""></label>
+    <label>Tytuł<input type="text" name="title" value=""></label>
+    <input type="submit" name="submit" value="Wyślij">
+</form>
+</body>
+</html>

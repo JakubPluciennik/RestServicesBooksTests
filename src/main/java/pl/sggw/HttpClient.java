@@ -29,7 +29,7 @@ public class HttpClient {
 
     int status = con.getResponseCode();
     BufferedReader in = new BufferedReader(
-        new InputStreamReader(con.getInputStream()));
+        new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
     String inputLine;
     StringBuilder content = new StringBuilder();
     while ((inputLine = in.readLine()) != null) {
@@ -42,8 +42,7 @@ public class HttpClient {
   }
 
   public static class ParameterStringBuilder {
-    public static String getParamsString(Map<String, String> params)
-        throws UnsupportedEncodingException {
+    public static String getParamsString(Map<String, String> params){
       StringBuilder result = new StringBuilder();
 
       for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -54,6 +53,7 @@ public class HttpClient {
       }
 
       String resultString = result.toString();
+      System.out.println(resultString);
       return resultString.length() > 0
           ? resultString.substring(0, resultString.length() - 1)
           : resultString;
