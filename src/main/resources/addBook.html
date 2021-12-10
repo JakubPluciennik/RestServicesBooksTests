@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <title>Przeglądanie książek</title>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        body{
+  font-family: Helvetica;
+  background-color: #4f4f4f;
+}
+.form{
+  min-width:700px;
+  max-width: 1080px;
+  margin:auto;
+  clear:both;
+  border: 3px solid black;
+  background-color:#afafaf;
+}
+.textInput{
+  float:left;
+  padding-left:15px;
+  width:calc((100% / 3) - 25px );
+  font-size:1.2rem;
+}
+.textInput input{
+  display:block;
+  margin:15px;
+  margin-left:0;
+  width:100%;
+}
+input[type=submit]{
+  width:20%;
+  height:40px;
+  font-size:1.2rem;
+  position: relative;
+  left:40%;
+  margin-bottom:20px;
+}
+
+.backButton{
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+.backButton button{
+  font-size: 1.2rem;
+}
+
+    </style>
+</head>
+  <body>
+    <a class="backButton" href="index.html"><button>Powrót do menu</button></a>
+  <main class="form">
+    <form class="add" action="books.html" method="post">
+      <label class="textInput" for="title"> Tytuł <input type="text" name="title" value=""></label>
+      <label class="textInput" for="authorName"> Imię Autora<input type="text" name="authorName" value=""></label>
+      <label class="textInput" for="authorSurname">Nazwisko Autora<input type="text" name="authorSurname" value=""></label>
+      <input type="submit" name="add" value="Dodaj">
+    </form>
+    </main>
+  </body>
+</html>

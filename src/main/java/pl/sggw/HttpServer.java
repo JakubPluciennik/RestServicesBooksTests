@@ -17,8 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpServer {
-  final static Path post = Path.of("src/main/resources/index.html");
+  static final Path index = Path.of("src/main/resources/index.html");
+  static final Path books = Path.of("src/main/resources/books.html");
+  static final Path manage = Path.of("src/main/resources/manage.html");
+  static final Path addBook = Path.of("src/main/resources/addBook.html");
+  static final Path updateBook = Path.of("src/main/resources/updateBook.html");
   static boolean status = true;
+
   public static void main(String[] args) throws IOException {
 
     ServerSocket serverSocket = new ServerSocket(8080);
@@ -29,8 +34,7 @@ public class HttpServer {
     }
   }
 
-  private static void listenAndServe(ServerSocket serverSocket)
-      throws IOException {
+  private static void listenAndServe(ServerSocket serverSocket) throws IOException {
     Socket socket = serverSocket.accept();
 
     Thread thread = new Thread(new Runnable() {
@@ -61,34 +65,64 @@ public class HttpServer {
     while (bufferedReader.ready()) {
       char c = (char) bufferedReader.read();
       if (c == '\n') {
-        stringList.add(tmp);
+        stringList.add(URLDecoder.decode(tmp, StandardCharsets.UTF_8.name()));
         tmp = "";
       } else {
         tmp += c;
       }
     }
 
-    //ostatnia linia z zapytaniem z Formularza
-    String formData = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
-
-    /*
-    for (String s:stringList) {
-      System.out.println(s);
+    String getType = "";
+    String action;
+    String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
+    if (postInfo.length() > 0 && stringList.size() > 20) {
+      if (HtmlWriter.addBookAction(postInfo)) {
+        System.out.println("Dodano pomyślnie książkę");
+      }
     }
-    */
-
-    //Operacje POST, GET, PUT, DELETE
-    if (stringList.get(0).startsWith("POST")) {
-      System.out.println(Reflection.addBook(formData));
-    }
-
 
     //Write to Website
     bufferedWriter.write("HTTP/1.1 200 OK\n");
     bufferedWriter.write("Connection: close\n");
     bufferedWriter.write("Content-Type: text/html; charset=UTF-8 \n\n");
 
-    bufferedWriter.write(Files.readString(post));
+
+    //4 możliwości:
+    //  - GET /books.html
+    //  - GET /manage.html
+    //  - GET /addBook.html
+    //  - GET /updateBook.html ?id=[id]&
+    if (!stringList.isEmpty() && stringList.get(0).contains("?")) {
+      getType = stringList.get(0).substring(0, stringList.get(0).indexOf((int) '?'));
+
+
+      action = getType.split("/")[1];
+
+      switch (action) {
+        case ("books.html") -> HtmlWriter.books(bufferedWriter);  //wypisanie książek
+        case ("manage.html") -> HtmlWriter.manage(bufferedWriter);  //zarządzanie książkami
+        case ("addBook.html") -> HtmlWriter.addBook(bufferedWriter);  //dodanie książki
+        case ("updateBook.html") -> HtmlWriter.updateBook(bufferedWriter);  //edycja książki
+        default -> {
+        }
+      }
+    } else if (stringList.get(0).contains("POST")) {
+      try {
+        String[] stringArray = stringList.get(0).split("[ //]");
+        if (stringArray.length > 3) {
+          String postAction = stringArray[2];
+          if (postAction.equals("books.html")) {
+            HtmlWriter.books(bufferedWriter);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+
+    } else {
+      bufferedWriter.write(Files.readString(index));
+    }
 
     bufferedWriter.flush();
     bufferedWriter.close();
