@@ -6,26 +6,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
+
         body{
   font-family: Helvetica;
   background-color: #4f4f4f;
 }
 .form{
-  min-width:700px;
+min-width:550px;
   max-width: 1080px;
   margin:auto;
-  clear:both;
   border: 3px solid black;
   background-color:#afafaf;
 }
-.clearfix {
-  content: "";
-  clear: both;
-  display: table;
-}
 .option{
+min-width:500px;
+margin:auto;
   min-height: 11vh;
-  float: left;
   padding:15px;
   width:calc(50% - 30px);
 }
@@ -34,6 +30,9 @@
   width:100%;
   padding:10px;
   margin-top:15px;
+}
+.id{
+font-size:1.2rem;
 }
 
 .backButton{
@@ -44,10 +43,15 @@
 .backButton button{
   font-size: 1.2rem;
 }
-
     </style>
+
 </head>
   <body>
     <a class="backButton" href="index.html"><button>Powrót do menu</button></a>
+    <main class="form">
+    <form class="option" action="/clearBooksAction" method="post">
+        <input type = submit value="Usuń wszystkie książki">
+    </form>
+    </main>
   </body>
 </html>

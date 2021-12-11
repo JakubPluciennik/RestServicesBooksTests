@@ -54,10 +54,8 @@ public class HttpServer {
     InputStream socketInputStream = socket.getInputStream();
     OutputStream socketOutputStream = socket.getOutputStream();
 
-    BufferedWriter bufferedWriter =
-        new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
-    BufferedReader bufferedReader =
-        new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
+    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
 
     //Read from Website
     List<String> stringList = new ArrayList<>();
@@ -72,13 +70,38 @@ public class HttpServer {
       }
     }
 
-    String getType = "";
-    String action;
+    String action = "";
     String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
-    if (postInfo.length() > 0 && stringList.size() > 20) {
-      if (HtmlWriter.addBookAction(postInfo)) {
-        System.out.println("Dodano pomyślnie książkę");
+    if (stringList.get(0).contains("POST")) {
+      if (!stringList.get(0).contains("Action") && postInfo.length() > 0) {  //dodanie książki
+        if (HtmlWriter.addBookAction(postInfo)) {
+          System.out.println("Dodano pomyślnie książkę");
+        } else {
+          System.out.println("Nie udało się dodać książki");
+        }
+      } else {  // updateBookAction i clearBooksAction
+        if (stringList.get(0).contains("update")) {
+          boolean updateInfo = HtmlWriter.updateBookAction(postInfo);
+          if (updateInfo) {
+            //redirect do books.html
+            action = "redirect";
+          } else {
+            stringList.set(0, "GET /index.html HTTP/1.1");
+          }
+        } else if (stringList.get(0).contains("clear")) {
+          boolean clearInfo = HtmlWriter.clearBooksAction(postInfo);
+          if (clearInfo) {
+            //redirect do books.html
+            action = "redirect";
+          } else {
+            stringList.set(0, "GET /index.html HTTP/1.1");
+          }
+        }
       }
+
+    }
+    for (String s : stringList) {
+      System.out.println(s);
     }
 
     //Write to Website
@@ -86,29 +109,32 @@ public class HttpServer {
     bufferedWriter.write("Connection: close\n");
     bufferedWriter.write("Content-Type: text/html; charset=UTF-8 \n\n");
 
-
     //4 możliwości:
     //  - GET /books.html
     //  - GET /manage.html
     //  - GET /addBook.html
     //  - GET /updateBook.html ?id=[id]&
-    if (!stringList.isEmpty() && stringList.get(0).contains("?")) {
-      getType = stringList.get(0).substring(0, stringList.get(0).indexOf((int) '?'));
-
-
+    if (action.equals("redirect")) {
+      //redirect do books.html
+      bufferedWriter.write("<!doctype html><html lang=\"pl\"><head><title>redirect</title><meta charset=\"utf-8\">" +
+          "<meta http-equiv=\"refresh\" content=\"0; url=books.html\" /><style>\n body{\nfont-family: Helvetica;\n " +
+          "background-color: #4f4f4f;\n}</style></head><body><p>Proszę zaczekać...</p></body></html>\n");
+    } else if (stringList.get(0).contains(".html")) {
+      String[] getArray = stringList.get(0).split("[ ?=&]");
+      String getType = getArray[1];
       action = getType.split("/")[1];
 
       switch (action) {
         case ("books.html") -> HtmlWriter.books(bufferedWriter);  //wypisanie książek
         case ("manage.html") -> HtmlWriter.manage(bufferedWriter);  //zarządzanie książkami
         case ("addBook.html") -> HtmlWriter.addBook(bufferedWriter);  //dodanie książki
-        case ("updateBook.html") -> HtmlWriter.updateBook(bufferedWriter);  //edycja książki
-        default -> {
-        }
+        case ("updateBook.html") -> HtmlWriter.updateBook(bufferedWriter, getArray[3]);  //edycja książki
+        case ("index.html") -> bufferedWriter.write(Files.readString(index));
+        default -> bufferedWriter.write("<p>strona nie istnieje :(");
       }
     } else if (stringList.get(0).contains("POST")) {
       try {
-        String[] stringArray = stringList.get(0).split("[ //]");
+        String[] stringArray = stringList.get(0).split("[ /]");
         if (stringArray.length > 3) {
           String postAction = stringArray[2];
           if (postAction.equals("books.html")) {
@@ -118,8 +144,6 @@ public class HttpServer {
       } catch (Exception e) {
         e.printStackTrace();
       }
-
-
     } else {
       bufferedWriter.write(Files.readString(index));
     }

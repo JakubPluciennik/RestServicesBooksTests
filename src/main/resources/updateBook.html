@@ -18,22 +18,25 @@
   border: 3px solid black;
   background-color:#afafaf;
 }
-.clearfix {
-  content: "";
-  clear: both;
-  display: table;
+.textInput{
+  float:left;
+  padding-left:15px;
+  width:calc((100% / 3) - 25px );
+  font-size:1.2rem;
 }
-.option{
-  min-height: 11vh;
-  float: left;
-  padding:15px;
-  width:calc(50% - 30px);
-}
-.option input[type=submit]{
-  font-size: 2rem;
+.textInput input{
+  display:block;
+  margin:15px;
+  margin-left:0;
   width:100%;
-  padding:10px;
-  margin-top:15px;
+}
+input[type=submit]{
+  width:20%;
+  height:40px;
+  font-size:1.2rem;
+  position: relative;
+  left:40%;
+  margin-bottom:20px;
 }
 
 .backButton{
@@ -49,5 +52,7 @@
 </head>
   <body>
     <a class="backButton" href="index.html"><button>Powrót do menu</button></a>
-  </body>
-</html>
+    <main class="form">
+        <form class="update" action="/updateBookAction" method="post">
+
+

@@ -11,8 +11,11 @@
   background-color: #4f4f4f;
 }
 .form{
-  min-width:700px;
+  overflow: auto;
+  font-size:1.2rem;
+  min-width:50vw;
   max-width: 1080px;
+  max-height:96vh;
   margin:auto;
   clear:both;
   border: 3px solid black;
@@ -30,6 +33,36 @@ div{
 text-align:center;
 font-size:2rem;
 margin:20px;
+}
+table{
+  width:100%;
+}
+th{
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0px;
+  border-bottom:1px solid black;
+  border-right: 1px solid black;
+  background-color:#afafaf;
+}
+td{
+  border-right:1px solid black;
+  padding-left:2%;
+}
+
+.id{
+  width:6%;
+  padding-left:0%;
+  text-align: center;
+}
+.title{
+  width:38%;
+}
+.authorName{
+  width:18%;
+}
+.authorSurname{
+  width:28%;
 }
 
     </style>
