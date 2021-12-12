@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlWriter {
+  public HtmlWriter() {
+  }
 
-  static List<Book> bookList = new ArrayList<>();
-  private static int bookIndex = 1;
-  private static int updateIndex = -1;
-  //private Book b;
+  List<Book> bookList = new ArrayList<>();
+  private int bookIndex = 1;
+  private int updateIndex = -1;
 
-  private static Book getBook(int index) {
+
+  private Book getBook(int index) {
     Book wynik = null;
     try {
       for (Book b : bookList) {
@@ -32,7 +34,7 @@ public class HtmlWriter {
     return wynik;
   }
 
-  private static boolean setBook(Book book) {
+  private boolean setBook(Book book) {
     try {
       for (int i = 0; i < bookList.size(); i++) {
         Book tmp = bookList.get(i);
@@ -48,15 +50,15 @@ public class HtmlWriter {
   }
 
 
-  public static class Autor {
+  public class Autor {
     private String name;
     private String surname;
   }
 
-  public static class Book {
+  public class Book {
     private int index;
     private String title;
-    private Autor autor = new Autor();
+    private final Autor autor = new Autor();
 
     public Book(String title, String authorName, String authorSurname) {
       this.index = bookIndex;
@@ -64,6 +66,7 @@ public class HtmlWriter {
       this.autor.name = authorName;
       this.autor.surname = authorSurname;
     }
+
     public Book(String title, String authorName, String authorSurname, int index) {
       this.index = index;
       this.title = title;
@@ -81,7 +84,7 @@ public class HtmlWriter {
    * @param bufferedWriter wypisywanie na stronę
    * @throws IOException
    */
-  public static void books(BufferedWriter bufferedWriter) throws IOException {
+  public void books(BufferedWriter bufferedWriter) throws IOException {
     bufferedWriter.write(Files.readString(HttpServer.books));
     if (bookList.isEmpty()) {
       bufferedWriter.write("<div>Brak książek</div>");
@@ -107,17 +110,18 @@ public class HtmlWriter {
    * @return
    * @throws IOException
    */
-  public static boolean manage(BufferedWriter bufferedWriter) throws IOException {
+  public boolean manage(BufferedWriter bufferedWriter) throws IOException {
     bufferedWriter.write(Files.readString(HttpServer.manage));
 
     return true;
   }
 
-  public static boolean clearBooksAction(String postInfo) {
+  public boolean clearBooksAction(String postInfo) {
     bookList.clear();
     bookIndex = 1;
     return true;
   }
+
   /**
    * GET /addBook.html 0.1 - formularz do dodawania książki wysyłany POST'em inputy
    * "title", "authorName" "authorSurname", po wysłaniu ma być redirect do /books.html
@@ -126,7 +130,7 @@ public class HtmlWriter {
    * @return
    * @throws IOException
    */
-  public static void addBook(BufferedWriter bufferedWriter) throws IOException {
+  public void addBook(BufferedWriter bufferedWriter) throws IOException {
     bufferedWriter.write(Files.readString(HttpServer.addBook));
   }
 
@@ -136,7 +140,7 @@ public class HtmlWriter {
    * @param s zapytanie POST z danymi do dodania książki
    * @return
    */
-  public static synchronized boolean addBookAction(String s) {
+  public synchronized boolean addBookAction(String s) {
     try {
       if (s.contains("=") && s.contains("&")) {
         String[] sArray = s.split("[&=]");
@@ -165,11 +169,12 @@ public class HtmlWriter {
    * @return
    * @throws IOException
    */
-  public static void updateBook(BufferedWriter bufferedWriter, String indexS) throws IOException {
+  public void updateBook(BufferedWriter bufferedWriter, String indexS) throws IOException {
     try {
       bufferedWriter.write(Files.readString(HttpServer.updateBook));
-      if(indexS.length()==0) throw new NullPointerException();
-      else if (Integer.parseInt(indexS) > bookIndex) {
+      if (indexS.length() == 0) {
+        throw new NullPointerException();
+      } else if (Integer.parseInt(indexS) > bookIndex) {
         throw new IndexOutOfBoundsException();
       } else {
         int index = Integer.parseInt(indexS);
@@ -196,7 +201,7 @@ public class HtmlWriter {
     }
   }
 
-  public static synchronized boolean updateBookAction(String s) {
+  public synchronized boolean updateBookAction(String s) {
     try {
       if (s.contains("=") && s.contains("&") && updateIndex < bookIndex) {
         String[] sArray = s.split("[&=]");

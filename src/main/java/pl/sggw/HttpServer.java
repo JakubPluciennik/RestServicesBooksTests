@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
@@ -22,7 +23,9 @@ public class HttpServer {
   static final Path manage = Path.of("src/main/resources/manage.html");
   static final Path addBook = Path.of("src/main/resources/addBook.html");
   static final Path updateBook = Path.of("src/main/resources/updateBook.html");
+  static final Path jsonPath = Path.of("src/main/resources/data.json");
   static boolean status = true;
+  static HtmlWriter htmlWriter = new HtmlWriter();
 
   public static void main(String[] args) throws IOException {
 
@@ -31,6 +34,11 @@ public class HttpServer {
 
     while (status) {
       listenAndServe(serverSocket);
+      String s = Reflection.serializeJson(htmlWriter);
+      PrintWriter writer = new PrintWriter(jsonPath.toFile(), StandardCharsets.UTF_8);
+      writer.println(s);
+      writer.close();
+
     }
   }
 
@@ -72,16 +80,16 @@ public class HttpServer {
 
     String action = "";
     String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
-    if (stringList.get(0).contains("POST")) {
+    if (stringList.size() > 0 && stringList.get(0).contains("POST")) {
       if (!stringList.get(0).contains("Action") && postInfo.length() > 0) {  //dodanie książki
-        if (HtmlWriter.addBookAction(postInfo)) {
+        if (htmlWriter.addBookAction(postInfo)) {
           System.out.println("Dodano pomyślnie książkę");
         } else {
           System.out.println("Nie udało się dodać książki");
         }
       } else {  // updateBookAction i clearBooksAction
         if (stringList.get(0).contains("update")) {
-          boolean updateInfo = HtmlWriter.updateBookAction(postInfo);
+          boolean updateInfo = htmlWriter.updateBookAction(postInfo);
           if (updateInfo) {
             //redirect do books.html
             action = "redirect";
@@ -89,7 +97,7 @@ public class HttpServer {
             stringList.set(0, "GET /index.html HTTP/1.1");
           }
         } else if (stringList.get(0).contains("clear")) {
-          boolean clearInfo = HtmlWriter.clearBooksAction(postInfo);
+          boolean clearInfo = htmlWriter.clearBooksAction(postInfo);
           if (clearInfo) {
             //redirect do books.html
             action = "redirect";
@@ -125,10 +133,10 @@ public class HttpServer {
       action = getType.split("/")[1];
 
       switch (action) {
-        case ("books.html") -> HtmlWriter.books(bufferedWriter);  //wypisanie książek
-        case ("manage.html") -> HtmlWriter.manage(bufferedWriter);  //zarządzanie książkami
-        case ("addBook.html") -> HtmlWriter.addBook(bufferedWriter);  //dodanie książki
-        case ("updateBook.html") -> HtmlWriter.updateBook(bufferedWriter, getArray[3]);  //edycja książki
+        case ("books.html") -> htmlWriter.books(bufferedWriter);  //wypisanie książek
+        case ("manage.html") -> htmlWriter.manage(bufferedWriter);  //zarządzanie książkami
+        case ("addBook.html") -> htmlWriter.addBook(bufferedWriter);  //dodanie książki
+        case ("updateBook.html") -> htmlWriter.updateBook(bufferedWriter, getArray[3]);  //edycja książki
         case ("index.html") -> bufferedWriter.write(Files.readString(index));
         default -> bufferedWriter.write("<p>strona nie istnieje :(");
       }
@@ -138,7 +146,7 @@ public class HttpServer {
         if (stringArray.length > 3) {
           String postAction = stringArray[2];
           if (postAction.equals("books.html")) {
-            HtmlWriter.books(bufferedWriter);
+            htmlWriter.books(bufferedWriter);
           }
         }
       } catch (Exception e) {
