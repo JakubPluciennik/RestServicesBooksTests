@@ -14,16 +14,17 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HttpServer {
-  static final Path index = Path.of("src/main/resources/index.html");
-  static final Path books = Path.of("src/main/resources/books.html");
-  static final Path manage = Path.of("src/main/resources/manage.html");
-  static final Path addBook = Path.of("src/main/resources/addBook.html");
-  static final Path updateBook = Path.of("src/main/resources/updateBook.html");
-  static final Path jsonPath = Path.of("src/main/resources/data.json");
+  static final Path index = Paths.get("src/main/resources/index.html");
+  static final Path books = Paths.get("src/main/resources/books.html");
+  static final Path manage = Paths.get("src/main/resources/manage.html");
+  static final Path addBook = Paths.get("src/main/resources/addBook.html");
+  static final Path updateBook = Paths.get("src/main/resources/updateBook.html");
+  static final Path jsonPath = Paths.get("src/main/resources/data.json");
   static boolean status = true;
   static HtmlWriter htmlWriter = new HtmlWriter();
 
@@ -35,7 +36,7 @@ public class HttpServer {
     while (status) {
       listenAndServe(serverSocket);
       String s = Reflection.serializeJson(htmlWriter);
-      PrintWriter writer = new PrintWriter(jsonPath.toFile(), StandardCharsets.UTF_8);
+      PrintWriter writer = new PrintWriter(jsonPath.toFile(), "UTF-8");
       writer.println(s);
       writer.close();
 
@@ -150,7 +151,9 @@ public class HttpServer {
           htmlWriter.updateBook(bufferedWriter, getArray[3]);
           break;
         case ("index.html"):
-          bufferedWriter.write(Files.readString(index));
+          for (String s : Files.readAllLines(HttpServer.index)) {
+            bufferedWriter.write(s);
+          }
           break;
         default:
           bufferedWriter.write("<p>strona nie istnieje :(");
@@ -169,7 +172,9 @@ public class HttpServer {
         e.printStackTrace();
       }
     } else {
-      bufferedWriter.write(Files.readString(index));
+      for (String s : Files.readAllLines(HttpServer.index)) {
+        bufferedWriter.write(s);
+      }
     }
 
     bufferedWriter.flush();

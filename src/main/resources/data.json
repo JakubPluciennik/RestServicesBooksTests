@@ -15,8 +15,16 @@
 "name":"Imię 2",
 "surname":"Nazwisko 2"
 }
+},
+{
+"index":3,
+"title":"Tytuł 3",
+"autor":{
+"name":"Imię 3",
+"surname":"Nazwisko 3 "
+}
 }
 ],
-"bookIndex":3,
+"bookIndex":4,
 "updateIndex":-1
 }
