@@ -30,7 +30,7 @@ public class HttpServer {
   public static void main(String[] args) throws IOException {
 
     ServerSocket serverSocket = new ServerSocket(8080);
-
+    htmlWriter = Reflection.deserializeJson(jsonPath);
 
     while (status) {
       listenAndServe(serverSocket);

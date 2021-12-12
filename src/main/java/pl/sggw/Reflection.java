@@ -1,14 +1,23 @@
 package pl.sggw;
 
+import com.google.gson.Gson;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Reflection {
+  public static void main(String[] args) throws IOException, IllegalAccessException {
+
+    deserializeJson(HttpServer.jsonPath);
+  }
 
   /**
-   * Metoda do serializacji Objektu HtmlWriter za pomocą relfeksji. (teoretycznie do każdego obiektu, w teorii nie sprawdzałem)
+   * Metoda do serializacji Objektu HtmlWriter za pomocą relfeksji.
    *
    * @param object obiekt do serializacji
    * @param <T>    typ obketu
@@ -77,9 +86,17 @@ public class Reflection {
     }
   }
 
-  public static <T> T deserializeJson(T object) {
-
-    return (T)new Object();
+  //używanie biblioteki GSon, nie udało mi się refleksjami
+  public static HtmlWriter deserializeJson(Path jsonPath) {
+    HtmlWriter htmlWriter = new HtmlWriter();
+    try {
+      BufferedReader reader = new BufferedReader(new FileReader(jsonPath.toString()));
+      Gson g = new Gson();
+      htmlWriter = g.fromJson(reader, HtmlWriter.class);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return htmlWriter;
   }
 }
 
