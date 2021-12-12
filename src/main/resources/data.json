@@ -2,45 +2,21 @@
 "bookList":[
 {
 "index":1,
-"title":"a",
+"title":"Tytuł 1",
 "autor":{
-"name":"a",
-"surname":"a"
+"name":"Imię 1",
+"surname":"Nazwisko 1"
 }
 },
 {
 "index":2,
-"title":"b",
+"title":"Tytuł 2",
 "autor":{
-"name":"b",
-"surname":"b"
-}
-},
-{
-"index":3,
-"title":"c",
-"autor":{
-"name":"c",
-"surname":"c"
-}
-},
-{
-"index":4,
-"title":"d",
-"autor":{
-"name":"d",
-"surname":"d"
-}
-},
-{
-"index":5,
-"title":"e",
-"autor":{
-"name":"e",
-"surname":"e"
+"name":"Imię 2",
+"surname":"Nazwisko 2"
 }
 }
 ],
-"bookIndex":6,
+"bookIndex":3,
 "updateIndex":-1
 }
