@@ -132,13 +132,29 @@ public class HttpServer {
       String getType = getArray[1];
       action = getType.split("/")[1];
 
+      //wypisanie książek
+      //zarządzanie książkami
+      //dodanie książki
+      //edycja książki
       switch (action) {
-        case ("books.html") -> htmlWriter.books(bufferedWriter);  //wypisanie książek
-        case ("manage.html") -> htmlWriter.manage(bufferedWriter);  //zarządzanie książkami
-        case ("addBook.html") -> htmlWriter.addBook(bufferedWriter);  //dodanie książki
-        case ("updateBook.html") -> htmlWriter.updateBook(bufferedWriter, getArray[3]);  //edycja książki
-        case ("index.html") -> bufferedWriter.write(Files.readString(index));
-        default -> bufferedWriter.write("<p>strona nie istnieje :(");
+        case ("books.html"):
+          htmlWriter.books(bufferedWriter);
+          break;
+        case ("manage.html"):
+          htmlWriter.manage(bufferedWriter);
+          break;
+        case ("addBook.html"):
+          htmlWriter.addBook(bufferedWriter);
+          break;
+        case ("updateBook.html"):
+          htmlWriter.updateBook(bufferedWriter, getArray[3]);
+          break;
+        case ("index.html"):
+          bufferedWriter.write(Files.readString(index));
+          break;
+        default:
+          bufferedWriter.write("<p>strona nie istnieje :(");
+          break;
       }
     } else if (stringList.get(0).contains("POST")) {
       try {
