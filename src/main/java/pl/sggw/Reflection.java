@@ -11,10 +11,6 @@ import java.util.List;
 
 
 public class Reflection {
-  public static void main(String[] args) throws IOException, IllegalAccessException {
-
-    deserializeJson(HttpServer.jsonPath);
-  }
 
   /**
    * Metoda do serializacji Objektu HtmlWriter za pomocą relfeksji.
