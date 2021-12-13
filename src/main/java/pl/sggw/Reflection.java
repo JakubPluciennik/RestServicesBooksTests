@@ -2,8 +2,10 @@ package pl.sggw;
 
 import com.google.gson.Gson;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -86,7 +88,7 @@ public class Reflection {
   public static HtmlWriter deserializeJson(Path jsonPath) {
     HtmlWriter htmlWriter = new HtmlWriter();
     try {
-      BufferedReader reader = new BufferedReader(new FileReader(jsonPath.toString()));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonPath.toString()), "UTF-8"));
       Gson g = new Gson();
       htmlWriter = g.fromJson(reader, HtmlWriter.class);
     } catch (Exception e) {
