@@ -63,8 +63,8 @@ public class HttpServer {
     InputStream socketInputStream = socket.getInputStream();
     OutputStream socketOutputStream = socket.getOutputStream();
 
-    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
-    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
+    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, "UTF-8"));
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, "UTF-8"));
 
     //Read from Website
     List<String> stringList = new ArrayList<>();
@@ -72,7 +72,7 @@ public class HttpServer {
     while (bufferedReader.ready()) {
       char c = (char) bufferedReader.read();
       if (c == '\n') {
-        stringList.add(URLDecoder.decode(tmp, StandardCharsets.UTF_8.name()));
+        stringList.add(URLDecoder.decode(tmp, "UTF-8"));
         tmp = "";
       } else {
         tmp += c;
@@ -80,7 +80,7 @@ public class HttpServer {
     }
 
     String action = "";
-    String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
+    String postInfo = URLDecoder.decode(tmp, "UTF-8");
     if (stringList.size() > 0 && stringList.get(0).contains("POST")) {
       if (!stringList.get(0).contains("Action") && postInfo.length() > 0) {  //dodanie książki
         if (htmlWriter.addBookAction(postInfo)) {
