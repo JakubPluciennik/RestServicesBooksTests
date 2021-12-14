@@ -140,7 +140,7 @@ public class HtmlWriter {
    * @param s zapytanie POST z danymi do dodania książki
    * @return
    */
-  public synchronized boolean addBookAction(String s) {
+  public boolean addBookAction(String s) {
     try {
       if (s.contains("=") && s.contains("&")) {
         String[] sArray = s.split("[&=]");
@@ -201,7 +201,7 @@ public class HtmlWriter {
     }
   }
 
-  public synchronized boolean updateBookAction(String s) {
+  public boolean updateBookAction(String s) {
     try {
       if (s.contains("=") && s.contains("&") && updateIndex < bookIndex) {
         String[] sArray = s.split("[&=]");

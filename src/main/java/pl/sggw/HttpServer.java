@@ -127,7 +127,7 @@ public class HttpServer {
       bufferedWriter.write("<!doctype html><html lang=\"pl\"><head><title>redirect</title><meta charset=\"utf-8\">" +
           "<meta http-equiv=\"refresh\" content=\"0; url=books.html\" /><style>\n body{\nfont-family: Helvetica;\n " +
           "background-color: #4f4f4f;\n}</style></head><body><p>Proszę zaczekać...</p></body></html>\n");
-    } else if (stringList.get(0).contains(".html")) {
+    } else if (stringList.size() > 0 && stringList.get(0).contains(".html")) {
       String[] getArray = stringList.get(0).split("[ ?=&]");
       String getType = getArray[1];
       action = getType.split("/")[1];
@@ -156,7 +156,7 @@ public class HttpServer {
           bufferedWriter.write("<p>strona nie istnieje :(");
           break;
       }
-    } else if (stringList.get(0).contains("POST")) {
+    } else if (stringList.size() > 0 && stringList.get(0).contains("POST")) {
       try {
         String[] stringArray = stringList.get(0).split("[ /]");
         if (stringArray.length > 3) {
