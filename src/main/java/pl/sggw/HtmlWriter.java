@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlWriter {
+
   public HtmlWriter() {
   }
 
@@ -49,6 +50,52 @@ public class HtmlWriter {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    HtmlWriter that = (HtmlWriter) o;
+
+    if (bookIndex != that.bookIndex) {
+      return false;
+    }
+    if (updateIndex != that.updateIndex) {
+      return false;
+    }
+    if (bookList.size() != that.bookList.size()) {
+      return false;
+    } else if (bookList.size() > 0) {
+      for (int i = 0; i < bookList.size(); i++) {
+        if(bookList.get(i).index != that.bookList.get(i).index){
+          return false;
+        }
+        if(!bookList.get(i).title.equals(that.bookList.get(i).title)){
+          return false;
+        }
+        if(!bookList.get(i).autor.name.equals(that.bookList.get(i).autor.name)){
+          return false;
+        }
+        if(!bookList.get(i).autor.surname.equals(that.bookList.get(i).autor.surname)){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = bookList != null ? bookList.hashCode() : 0;
+    result = 31 * result + bookIndex;
+    result = 31 * result + updateIndex;
+    return result;
+  }
+
 
   public class Autor {
     private String name;
@@ -76,6 +123,10 @@ public class HtmlWriter {
 
     public Book() {
     }
+  }
+
+  Book makeBook(String title, String authorName, String authorSurname, int index) {
+    return new Book(title, authorName, authorSurname, index);
   }
 
   /**

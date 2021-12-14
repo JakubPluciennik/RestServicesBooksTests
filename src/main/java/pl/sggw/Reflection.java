@@ -3,12 +3,14 @@ package pl.sggw;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Reflection {
@@ -86,13 +88,19 @@ public class Reflection {
   //używanie biblioteki GSon, nie udało mi się refleksjami
   public static HtmlWriter deserializeJson(Path jsonPath) {
     HtmlWriter htmlWriter = new HtmlWriter();
+    BufferedReader reader = null;
     try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonPath.toString()), StandardCharsets.UTF_8));
-      Gson g = new Gson();
-      htmlWriter = g.fromJson(reader, HtmlWriter.class);
-    } catch (Exception e) {
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonPath.toString()), StandardCharsets.UTF_8));
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+    return deserializeJson(reader.lines().collect(Collectors.joining("\n")));
+  }
+
+  public static HtmlWriter deserializeJson(String json) {
+    HtmlWriter htmlWriter;
+    Gson g = new Gson();
+    htmlWriter = g.fromJson(json, HtmlWriter.class);
     return htmlWriter;
   }
 }
