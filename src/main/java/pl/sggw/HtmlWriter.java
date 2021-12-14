@@ -85,7 +85,9 @@ public class HtmlWriter {
    * @throws IOException
    */
   public void books(BufferedWriter bufferedWriter) throws IOException {
-    bufferedWriter.write(Files.readString(HttpServer.books));
+    for (String s : Files.readAllLines(HttpServer.books)) {
+      bufferedWriter.write(s);
+    }
     if (bookList.isEmpty()) {
       bufferedWriter.write("<div>Brak książek</div>");
     } else {
@@ -111,8 +113,9 @@ public class HtmlWriter {
    * @throws IOException
    */
   public boolean manage(BufferedWriter bufferedWriter) throws IOException {
-    bufferedWriter.write(Files.readString(HttpServer.manage));
-
+    for (String s : Files.readAllLines(HttpServer.manage)) {
+      bufferedWriter.write(s);
+    }
     return true;
   }
 
@@ -131,7 +134,9 @@ public class HtmlWriter {
    * @throws IOException
    */
   public void addBook(BufferedWriter bufferedWriter) throws IOException {
-    bufferedWriter.write(Files.readString(HttpServer.addBook));
+    for (String s : Files.readAllLines(HttpServer.addBook)) {
+      bufferedWriter.write(s);
+    }
   }
 
   /**
@@ -171,7 +176,9 @@ public class HtmlWriter {
    */
   public void updateBook(BufferedWriter bufferedWriter, String indexS) throws IOException {
     try {
-      bufferedWriter.write(Files.readString(HttpServer.updateBook));
+      for (String s : Files.readAllLines(HttpServer.updateBook)) {
+        bufferedWriter.write(s);
+      }
       if (indexS.length() == 0) {
         throw new NullPointerException();
       } else if (Integer.parseInt(indexS) > bookIndex) {
