@@ -27,10 +27,16 @@ public class HttpServer {
   static boolean status = true;
   static HtmlWriter htmlWriter = new HtmlWriter();
 
-  public static void main(String[] args) throws IOException {
+  public void runServer() throws IOException {
 
     ServerSocket serverSocket = new ServerSocket(8080);
-    htmlWriter = Reflection.deserializeJson(jsonPath);
+    try {
+      htmlWriter = Reflection.deserializeJson(jsonPath);
+    } catch (Exception e) {
+      e.printStackTrace();
+      htmlWriter = new HtmlWriter();
+    }
+
 
     while (status) {
       listenAndServe(serverSocket);
@@ -38,141 +44,151 @@ public class HttpServer {
       PrintWriter writer = new PrintWriter(jsonPath.toFile(), StandardCharsets.UTF_8);
       writer.println(s);
       writer.close();
-
     }
   }
 
-  private static void listenAndServe(ServerSocket serverSocket) throws IOException {
+  private void listenAndServe(ServerSocket serverSocket) throws IOException {
     Socket socket = serverSocket.accept();
 
-    Thread thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          serverRequest(socket);
-        } catch (IOException | InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+    Thread thread = new Thread(() -> serverRequest(socket));
     thread.start();
   }
 
-  private static void serverRequest(Socket socket) throws IOException, InterruptedException {
-    InputStream socketInputStream = socket.getInputStream();
-    OutputStream socketOutputStream = socket.getOutputStream();
+  /**
+   * Główna logika strony html
+   * @param socket gniazdo na którym działa serwer
+   * @throws IOException
+   * @throws InterruptedException
+   */
+  private void serverRequest(Socket socket){
+    try {
+      InputStream socketInputStream = socket.getInputStream();
+      OutputStream socketOutputStream = socket.getOutputStream();
 
-    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
-    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
+      BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socketOutputStream, StandardCharsets.UTF_8));
+      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream, StandardCharsets.UTF_8));
 
-    //Read from Website
-    List<String> stringList = new ArrayList<>();
-    String tmp = "";
-    while (bufferedReader.ready()) {
-      char c = (char) bufferedReader.read();
-      if (c == '\n') {
-        stringList.add(URLDecoder.decode(tmp, StandardCharsets.UTF_8.name()));
-        tmp = "";
-      } else {
-        tmp += c;
-      }
-    }
-
-    String action = "";
-    String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
-    if (stringList.size() > 0 && stringList.get(0).contains("POST")) {
-      if (!stringList.get(0).contains("Action") && postInfo.length() > 0) {  //dodanie książki
-        if (htmlWriter.addBookAction(postInfo)) {
-          System.out.println("Dodano pomyślnie książkę");
+      //Read from Website
+      List<String> stringList = new ArrayList<>();
+      String tmp = "";
+      while (bufferedReader.ready()) {
+        char c = (char) bufferedReader.read();
+        if (c == '\n') {
+          stringList.add(URLDecoder.decode(tmp, StandardCharsets.UTF_8.name()));
+          tmp = "";
         } else {
-          System.out.println("Nie udało się dodać książki");
-        }
-      } else {  // updateBookAction i clearBooksAction
-        if (stringList.get(0).contains("update")) {
-          boolean updateInfo = htmlWriter.updateBookAction(postInfo);
-          if (updateInfo) {
-            //redirect do books.html
-            action = "redirect";
-          } else {
-            stringList.set(0, "GET /index.html HTTP/1.1");
-          }
-        } else if (stringList.get(0).contains("clear")) {
-          boolean clearInfo = htmlWriter.clearBooksAction(postInfo);
-          if (clearInfo) {
-            //redirect do books.html
-            action = "redirect";
-          } else {
-            stringList.set(0, "GET /index.html HTTP/1.1");
-          }
+          tmp += c;
         }
       }
 
-    }
-    for (String s : stringList) {
-      System.out.println(s);
-    }
+      String postInfo = URLDecoder.decode(tmp, StandardCharsets.UTF_8.name());
 
-    //Write to Website
-    bufferedWriter.write("HTTP/1.1 200 OK\n");
-    bufferedWriter.write("Connection: close\n");
-    bufferedWriter.write("Content-Type: text/html; charset=UTF-8 \n\n");
+      String action = postInfoAction(stringList, postInfo);
 
-    //4 możliwości:
-    //  - GET /books.html
-    //  - GET /manage.html
-    //  - GET /addBook.html
-    //  - GET /updateBook.html ?id=[id]&
-    if (action.equals("redirect")) {
-      //redirect do books.html
+      if (stringList.size() > 0) {
+        System.out.println(stringList.get(0));
+      }
+
+      //Write to Website
+      bufferedWriter.write("HTTP/1.1 200 OK\n");
+      bufferedWriter.write("Connection: close\n");
+      bufferedWriter.write("Content-Type: text/html; charset=UTF-8 \n\n");
+
+      //4 możliwości:
+      //  - GET /books.html
+      //  - GET /manage.html
+      //  - GET /addBook.html
+      //  - GET /updateBook.html ?id=[id]&
+      if (action.equals("redirect")) {
+        //redirect do books.html
+        redirect(bufferedWriter);
+
+      } else if (stringList.size() > 0 && stringList.get(0).contains(".html")) {
+        String[] getArray = stringList.get(0).split("[ ?=&]");
+        String getType = getArray[1];
+        action = getType.split("/")[1];
+
+        //wypisanie książek
+        //zarządzanie książkami
+        //dodanie książki
+        //edycja książki
+        actionSwitch(action, bufferedWriter, getArray);
+
+      } else {
+        bufferedWriter.write(Files.readString(index));
+      }
+
+      bufferedWriter.flush();
+      bufferedWriter.close();
+    } catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Wypisanie strony która została podana w String action
+   *
+   * @param action         string z akcją
+   * @param bufferedWriter do wypisywania na stronę html
+   * @param getArray       tablica z wydobytą akcją
+   * @throws IOException
+   */
+  private void actionSwitch(String action, BufferedWriter bufferedWriter, String[] getArray) throws IOException {
+    switch (action) {
+      case ("books.html") -> htmlWriter.books(bufferedWriter);
+      case ("manage.html") -> htmlWriter.manage(bufferedWriter);
+      case ("addBook.html") -> htmlWriter.addBook(bufferedWriter);
+      case ("updateBook.html") -> htmlWriter.updateBook(bufferedWriter, getArray[3]);
+      case ("index.html") -> bufferedWriter.write(Files.readString(index));
+      default -> bufferedWriter.write("<p>strona nie istnieje :(");
+    }
+  }
+
+  /**
+   * Tworzenie strony z redirectem do books.html
+   *
+   * @param bufferedWriter do wypisywania na stronę html
+   */
+  private void redirect(BufferedWriter bufferedWriter) {
+    try {
       bufferedWriter.write("<!doctype html><html lang=\"pl\"><head><title>redirect</title><meta charset=\"utf-8\">" +
           "<meta http-equiv=\"refresh\" content=\"0; url=books.html\" /><style>\n body{\nfont-family: Helvetica;\n " +
           "background-color: #4f4f4f;\n}</style></head><body><p>Proszę zaczekać...</p></body></html>\n");
-    } else if (stringList.size() > 0 && stringList.get(0).contains(".html")) {
-      String[] getArray = stringList.get(0).split("[ ?=&]");
-      String getType = getArray[1];
-      action = getType.split("/")[1];
-
-      //wypisanie książek
-      //zarządzanie książkami
-      //dodanie książki
-      //edycja książki
-      switch (action) {
-        case ("books.html"):
-          htmlWriter.books(bufferedWriter);
-          break;
-        case ("manage.html"):
-          htmlWriter.manage(bufferedWriter);
-          break;
-        case ("addBook.html"):
-          htmlWriter.addBook(bufferedWriter);
-          break;
-        case ("updateBook.html"):
-          htmlWriter.updateBook(bufferedWriter, getArray[3]);
-          break;
-        case ("index.html"):
-          bufferedWriter.write(Files.readString(index));
-          break;
-        default:
-          bufferedWriter.write("<p>strona nie istnieje :(");
-          break;
-      }
-    } else if (stringList.size() > 0 && stringList.get(0).contains("POST")) {
-      try {
-        String[] stringArray = stringList.get(0).split("[ /]");
-        if (stringArray.length > 3) {
-          String postAction = stringArray[2];
-          if (postAction.equals("books.html")) {
-            htmlWriter.books(bufferedWriter);
-          }
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    } else {
-      bufferedWriter.write(Files.readString(index));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    bufferedWriter.flush();
-    bufferedWriter.close();
+  /**
+   * Ustalenie która akcja ma być wykonywana
+   *
+   * @param stringList lista z zapytaniem od klienta
+   * @param postInfo   string z danymi z post
+   * @return "redirect" jeśli akcja została wykonana lub ""
+   */
+  private String postInfoAction(List<String> stringList, String postInfo) {
+    if (stringList.size() > 0 && stringList.get(0).contains("POST") && stringList.get(0).contains("Action")) {
+
+      if (stringList.get(0).contains("add")) {
+        boolean addInfo = htmlWriter.addBookAction(postInfo);
+        if (addInfo) {
+          //redirect do books.html
+          return "redirect";
+        }
+      } else if (stringList.get(0).contains("update")) {
+        boolean updateInfo = htmlWriter.updateBookAction(postInfo);
+        if (updateInfo) {
+          //redirect do books.html
+          return "redirect";
+        }
+      } else if (stringList.get(0).contains("clear")) {
+        boolean clearInfo = htmlWriter.clearBooksAction(postInfo);
+        if (clearInfo) {
+          //redirect do books.html
+          return "redirect";
+        }
+      }
+    }
+    return "";
   }
 }
