@@ -4,9 +4,10 @@ import java.io.IOException;
 
 public class Main {
   public static void main(String[] args) {
-    HttpServer httpServer = new HttpServer();
+
+    RESTService restService = new RESTService();
     try {
-      httpServer.runServer();
+      restService.runServer();
     } catch (IOException e) {
       e.printStackTrace();
     }

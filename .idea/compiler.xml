@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="SocketServerBooks" />
         <module name="SocketServerBooksJAVA17" />
+        <module name="RestServicesBooks" />
       </profile>
     </annotationProcessing>
   </component>

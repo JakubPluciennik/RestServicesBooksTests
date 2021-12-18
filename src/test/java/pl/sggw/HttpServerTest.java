@@ -35,4 +35,3 @@ class HttpServerTest {
     Assertions.assertEquals(new HtmlWriter().new Book("title", "authorName", "authorSurname", 3), result);
   }
 }
-//Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme

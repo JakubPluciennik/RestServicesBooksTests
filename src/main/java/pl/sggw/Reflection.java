@@ -37,6 +37,9 @@ public class Reflection {
       tmp = tmp.replaceAll("}\n\\{", "},\n{");
       tmp = tmp.replaceAll("\\{" + "\n" + "\\[", "[\n{");
       tmp = tmp.replaceAll("\\[\n\\{\n]", "[]");
+      if(object instanceof HtmlWriter.Book){
+        tmp = tmp.replaceAll("}\\n}\\n}","}\n}");
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
