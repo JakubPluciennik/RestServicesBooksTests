@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="RestServicesBooksTests" />
         <module name="SocketServerBooks" />
         <module name="SocketServerBooksJAVA17" />
         <module name="RestServicesBooks" />
