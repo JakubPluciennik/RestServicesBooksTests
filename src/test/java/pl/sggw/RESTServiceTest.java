@@ -212,7 +212,7 @@ class RESTServiceTest {
       }
     }
     connection.disconnect();
-    Assertions.assertFalse(response.isEmpty());
+    Assertions.assertTrue(response.toString().contains("ALL"));
   }
 
   @Test
@@ -234,7 +234,7 @@ class RESTServiceTest {
       }
     }
     connection.disconnect();
-    Assertions.assertFalse(response.isEmpty());
+    Assertions.assertTrue(response.toString().contains("4"));
   }
 
   @Test
